@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %} Gestion de mot de passe{% endblock %}</title>
-    {% block stylesheets %}
-        <link rel="stylesheet" href="{{ asset('build/css/app.css') }}">
-    {% endblock %}
+    {{ encore_entry_link_tags('index') }}
 </head>
 <body>
 
@@ -22,8 +20,6 @@
     {% block body %}{% endblock %}
 </div>
 
-{% block javascripts %}
-    <script src="{{ asset('build/js/app.js') }}"></script>
-{% endblock %}
+{{ encore_entry_script_tags('index') }}
 </body>
 </html>

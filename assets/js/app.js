@@ -1,3 +1,5 @@
+require('../css/app.scss');
+
 global.jQuery = require('jquery');
 global.axios = require('axios');
 
