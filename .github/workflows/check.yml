@@ -1,0 +1,61 @@
+name: check
+
+# secrets :
+# SSH_PRIVATE_KEY : cle ssh fichier id_rsa
+# HOST : Ip du serveur sur lesquels seront déployés les fichiers
+# USERNAME : user ssh pour se connecter au serveur
+# PATH : chemin de deploiement, eg : /var/www/...
+# PHP_VERSION : 7.4
+# NAME_APP : nom de l'application, eh : myreport divalto
+# GITHUB_REPO : repo du github, eg git@github.com:3cie/myreport_divalto.git
+
+on:
+  push:
+    branches:
+      - '*'
+      - '!master'
+      - '!develop'
+
+jobs:
+  php-cs:
+      name: PHP CS Fixer
+      runs-on: ubuntu-latest
+      container: gponty/deploy:7.4
+      steps:
+        - uses: actions/checkout@v2
+
+        - name: composer Install
+          run: make vendor
+
+        - name: php-cs-fixer default
+          run: make cs-dry
+
+  phpunit:
+    name: PHPStan - PHP Unit
+    runs-on: ubuntu-18.04
+    container: gponty/deploy:7.4
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: copy env
+        run: make copy-env
+
+      - name: composer Install
+        run: make vendor
+
+      - name: creation base+fixtures
+        run: make test-db
+
+      - name: phpunit
+        run: make phpunit
+
+      - name: phpstan
+        run: make phpstan

@@ -1,0 +1,37 @@
+name: deployer_master
+
+# secrets :
+# SSH_PRIVATE_KEY : cle ssh fichier id_rsa
+# HOST : Ip du serveur sur lesquels seront déployés les fichiers
+# USERNAME : user ssh pour se connecter au serveur
+# PATH : chemin de deploiement, eg : /var/www/...
+# PHP_VERSION : 7.4
+# NAME_APP : nom de l'application, eh : myreport divalto
+# GITHUB_REPO : repo du github, eg git@github.com:3cie/myreport_divalto.git
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deployer:
+    name: Deploiement master
+    runs-on: ubuntu-latest
+    container: gponty/deploy:7.4
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: webfactory/ssh-agent@v0.2.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: deployer
+        run: make deployer
+        env:
+          HOST_TO_DEPLOY: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PATH_TO_DEPLOY: ${{ secrets.PATH_PRODUCTION }}
+          PHP_VERSION: ${{ secrets.PHP_VERSION }}
+          NAME_APP: ${{ secrets.NAME_APP }}
+          GITHUB_REPO: ${{ secrets.GIT_REPO }}
